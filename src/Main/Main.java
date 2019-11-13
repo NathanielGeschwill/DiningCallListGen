@@ -28,7 +28,7 @@ public class Main implements ActionListener{
 	boolean atEnd, weekEnd;
 	ArrayList<Worker> worker, possibleW;
 	//ArrayList<Shift> shift;
-	final int SLOTS = 17;
+	final int TIMESLOTS = 17;
 	final int SHIFTS = 16;
 	JTextField[][] shiftF = new JTextField[SHIFTS][4];
 	ArrayList<double[]> finalHours;
@@ -42,20 +42,35 @@ public class Main implements ActionListener{
     	// create shift label list
     	shiftsNeeded = new ArrayList<JLabel[]>();
     	
-    	hoursNeeded = new double[SLOTS][2];
+    	// 
+    	hoursNeeded = new double[TIMESLOTS][2];
     	counter = -2;
     	
+    	// name of window
     	f = new JFrame(" MSC Calling List Generator");
+    	// size of window
     	f.setSize(225,850);
+    	// don't let them change size otherwise it screws up the layout
 		f.setResizable(false);
+		// close program when you close
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		// get content from frame
 		c1 = f.getContentPane();
+		
+		// new panels
 		p1 = new JPanel();
 		p2 = new JPanel();
+		
+		// title in frame
 		title = new JLabel("        MSC Calling List Generator        ");
+		// add to p1, north side
 		p1.add(title,BorderLayout.NORTH);
 		
+		// make string array with AM/PM
 		String AMPM[] = {"AM","PM"};
+		
+		// make 32 AM/PM combo boxes
 		comboAMPM = new JComboBox[SHIFTS*4][2];
 		for(int i=0; i<SHIFTS*4; i++) {
 			for(int ii=0; ii<2; ii++) {
@@ -63,22 +78,31 @@ public class Main implements ActionListener{
 			}
 		}
 		
+		// string for amount of shifts needed for one specific area
 		String shiftAmount[] = {"0","1","2","3","4"};
+		
+		// create 16 combo boxes that ask for amount of shifts need per area
 		comboShiftAmount = new JComboBox[SHIFTS];
 		for(int i=0; i<SHIFTS; i++) {
 			comboShiftAmount[i] = new JComboBox(shiftAmount);
 			
 		}
 		
+		// label for space - why do I have this???
 		space = new JLabel("");
+		// label to prompt area covered
 		headQ = new JLabel("  What Areas Do You Need Covered?");
 		p1.add(headQ);
+		// another space
 		footQ = new JLabel("");
 		p1.add(footQ);
 		
+		// 42x1 grid
 		p1.setLayout(new GridLayout(42, 1));
-		createTextFields();
-		createLabels();
+		// create time slot fields used to define open shift times
+		createTimeSlotFields();
+		// create labels that define which area this info is tied to
+		createAreaLabels();
 		createShifts();
 		
 		finish = new JButton("Finish");
@@ -224,8 +248,8 @@ public class Main implements ActionListener{
     	printList(findTwoHours(possibleW));
     }
     
-    public void createTextFields() {
-    
+    public void createTimeSlotFields() {
+    	// create 64 text fields for time slots
     	for(int i=0; i<SHIFTS; i++) {
     		for(int ii=0; ii<4; ii++) {
     			shiftF[i][ii] = new JTextField(2);
@@ -296,7 +320,7 @@ public class Main implements ActionListener{
     	p2.add(next,gbc);
     	f.pack();
     }
-    public void createLabels() {
+    public void createAreaLabels() {
     	shiftL = new JLabel[SHIFTS];
     	shiftL[0] = new JLabel("BDM Brew Devils");
 		shiftL[1] = new JLabel("BDM Buns & Bowls");
@@ -323,6 +347,8 @@ public class Main implements ActionListener{
 		}
     }
     public void createShifts() {
+    	// prompt window asking if you want weekday (1 day), Weekend (3 day), or use old info to generate with filling each employee
+    	// MAJOR REWORK NEEDED - heavy redesign to allow containment of employees which also need an update method
     	Object[] options = {"Weekday", "Weekend", "Load Previous"};
     	response = JOptionPane.showOptionDialog(f, "Are You Making a List for a Weekday or the Weekend or Load From Previous", "Prompt Question",
     			JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
@@ -361,8 +387,8 @@ public class Main implements ActionListener{
     	}
     }
     public void createTimeSheet() {
-    	border = new JLabel[SLOTS+1];
-    	timeB = new JRadioButton[SLOTS];
+    	border = new JLabel[TIMESLOTS+1];
+    	timeB = new JRadioButton[TIMESLOTS];
 		timeB[0] = new JRadioButton("6:00-7:00");
 		timeB[1] = new JRadioButton("7:00-7:50");
 		timeB[2] = new JRadioButton("8:00-8:55");
@@ -380,9 +406,9 @@ public class Main implements ActionListener{
 		timeB[14] = new JRadioButton("8:45-9:40");
 		timeB[15] = new JRadioButton("9:45-11:00");
 		timeB[16] = new JRadioButton("11:00-12:30");
-		border[SLOTS] = new JLabel("---------------------------------");
-		p1.add(border[SLOTS]);
-		for(int i=0; i<SLOTS; i++) {
+		border[TIMESLOTS] = new JLabel("---------------------------------");
+		p1.add(border[TIMESLOTS]);
+		for(int i=0; i<TIMESLOTS; i++) {
 			timeB[i].addActionListener(this);
 			p1.add(timeB[i]);
 			border[i] = new JLabel("---------------------------------");
@@ -501,7 +527,7 @@ public class Main implements ActionListener{
 					p1.remove(sAll);
 			    	c1.remove(p2);
 			    	c1.add(p1);
-					/*for(int i=0; i<SLOTS; i++) {
+					/*for(int i=0; i<TIMESLOTS; i++) {
 						hoursNeeded[i] = timeB[i].isSelected();
 					}*/
 			    	createTimeSheet();
@@ -509,7 +535,7 @@ public class Main implements ActionListener{
 					counter++;
 					headQ.setText("  Commitment Hours For");
 					footQ.setText("  " + worker.get(counter).getName());
-					for(int i=0; i<SLOTS; i++) {
+					for(int i=0; i<TIMESLOTS; i++) {
 						timeB[i].setSelected(false);
 					}
 					p1.add(sAll);
@@ -544,7 +570,7 @@ public class Main implements ActionListener{
 				}
 				counter++;
 				footQ.setText("  " + worker.get(counter).getName());
-				for(int i=0; i<SLOTS; i++) {
+				for(int i=0; i<TIMESLOTS; i++) {
 					timeB[i].setSelected(false);
 				}
 				f.setContentPane(c1);
@@ -553,14 +579,14 @@ public class Main implements ActionListener{
 				p1.remove(next);
 				p1.add(finish);
 				atEnd = true;
-				for(int i=0; i<SLOTS; i++) {
+				for(int i=0; i<TIMESLOTS; i++) {
 					timeB[i].setSelected(false);
 				}
 				f.setContentPane(c1);
 			}
 		}
 		if(event.getSource() == sAll) {
-			for(int i=0; i<SLOTS; i++) {
+			for(int i=0; i<TIMESLOTS; i++) {
 				
 				if(timeB[i].isSelected()) {
 					timeB[i].setSelected(false);
@@ -581,7 +607,7 @@ public class Main implements ActionListener{
 					p1.add(next);
 					atEnd = false;
 				}
-				for(int i=0; i<SLOTS; i++) {
+				for(int i=0; i<TIMESLOTS; i++) {
 					timeB[i].setSelected(false);
 				}
 				f.setContentPane(c1);
@@ -602,7 +628,7 @@ public class Main implements ActionListener{
 					p1.add(next);
 					atEnd = false;
 				}
-				for(int i=0; i<SLOTS; i++) {
+				for(int i=0; i<TIMESLOTS; i++) {
 					timeB[i].setSelected(false);
 				}
 				f.setContentPane(c1);
